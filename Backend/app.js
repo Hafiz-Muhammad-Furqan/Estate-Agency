@@ -1,13 +1,16 @@
+require("dotenv").config();
+
 const express = require("express");
 const cors = require("cors");
 const connectDB = require("./db/db");
 const ApiRoutes = require("./routes/ApiRoutes");
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
+
 connectDB();
 require("./services/cronJob");
 
@@ -18,5 +21,5 @@ app.get("/", (req, res) => {
 app.use("/api/v1", ApiRoutes);
 
 app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
+  console.log(`✅ Server running at http://localhost:${PORT}`);
 });
