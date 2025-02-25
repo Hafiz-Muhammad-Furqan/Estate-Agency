@@ -6,6 +6,7 @@ import LeadGeneration from "./Pages/LeadGeneration";
 import UpgradePlan from "./Pages/UpgradePlan";
 import DetailsPage from "./Pages/DetailsPage";
 import { PropertyProvider } from "./Context/PropertyContext";
+import FetchCsv from "./components/FetchCsv";
 
 const App = () => {
   return (
@@ -31,6 +32,7 @@ const App = () => {
           />
         </Route>
         <Route path="/upgrade-plan" element={<UpgradePlan />} />
+        <Route path="/csv" element={<FetchCsv />} />
       </Routes>
     </Router>
   );
