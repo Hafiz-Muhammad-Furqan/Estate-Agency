@@ -52,7 +52,7 @@ const UserDetails = ({ isFilterPanelOpen, setIsFilterPanelOpen }) => {
                       onClick={() => setSelectedProperty(property)}
                     >
                       {property["Property Name"] ||
-                        property.property_id.slice(0, 20)}
+                        property.address.slice(0, 20)}
                       ...
                     </Link>
                   </td>
