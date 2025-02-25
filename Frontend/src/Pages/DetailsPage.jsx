@@ -55,13 +55,18 @@ const DetailsPage = () => {
               <div className="flex items-start space-x-3">
                 <Phone className="w-5 h-5 text-gray-500 mt-1" />
                 <div>
-                  <p className="text-sm">{selectedProperty["Phone Number"]}</p>
+                  <p className="text-sm">
+                    {selectedProperty["Phone Number"] ||
+                      selectedProperty.phone_number}
+                  </p>
                 </div>
               </div>
               <div className="flex items-start space-x-3">
                 <MapPin className="w-5 h-5 text-gray-500 mt-1" />
                 <div>
-                  <p className="text-sm">{selectedProperty.Address}</p>
+                  <p className="text-sm">
+                    {selectedProperty.Address || selectedProperty.address}
+                  </p>
                 </div>
               </div>
             </div>
@@ -102,14 +107,16 @@ const DetailsPage = () => {
             </div>
             <div className="w-full h-48 overflow-hidden">
               <img
-                src={selectedProperty["Image URL"]}
+                src={
+                  selectedProperty["Image URL"] || selectedProperty.image_url
+                }
                 alt="Modern office building"
                 className="w-full h-full object-cover"
               />
             </div>
             <div className="p-4">
               <p className="text-sm text-gray-600 leading-relaxed">
-                {selectedProperty.Description}
+                {selectedProperty.Description || selectedProperty.description}
               </p>
             </div>
             <div className="border-t">
@@ -119,7 +126,8 @@ const DetailsPage = () => {
                 </h3>
                 <div className="space-y-1">
                   <p className="text-sm text-gray-600">
-                    Price: {selectedProperty["Price (€)"]}
+                    Price:{" "}
+                    {selectedProperty["Price (€)"] || selectedProperty.price}
                   </p>
                 </div>
               </div>
@@ -132,7 +140,7 @@ const DetailsPage = () => {
                 </h3>
 
                 <p className="text-sm text-gray-600">
-                  {selectedProperty.Address}
+                  {selectedProperty.Address || selectedProperty.address}
                 </p>
               </div>
             </div>

@@ -51,7 +51,9 @@ const UserDetails = ({ isFilterPanelOpen, setIsFilterPanelOpen }) => {
                       className="text-md font-semibold underline"
                       onClick={() => setSelectedProperty(property)}
                     >
-                      {property["Property Name"].slice(0, 20)}...
+                      {property["Property Name"] ||
+                        property.property_id.slice(0, 20)}
+                      ...
                     </Link>
                   </td>
 
@@ -59,13 +61,13 @@ const UserDetails = ({ isFilterPanelOpen, setIsFilterPanelOpen }) => {
                     <div className="inline-flex items-center gap-1 border border-gray-300 px-2 py-1 rounded-md">
                       <PhoneIncoming className="w-4 h-4 text-gray-500" />
                       <span className="whitespace-nowrap text-sm font-semibold">
-                        {property["Phone Number"]}
+                        {property["Phone Number"] || property.phone_number}
                       </span>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="inline-flex items-center gap-1 border border-gray-300 px-2 py-1 rounded-md">
-                      € {property["Price (€)"]}
+                      € {property["Price (€)"] || property.price}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
