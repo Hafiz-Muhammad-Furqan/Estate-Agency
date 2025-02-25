@@ -45,31 +45,33 @@ const collectionName = "Properties";
 router.get("/fetch-properties", async (req, res) => {
   try {
     // Dono APIs ko parallel call karna
-    const [response1, response2] = await Promise.all([
-      axios.get(PROPERTIES_API),
-      axios.get(PROPERTIES_API_2),
-    ]);
+    // const [response1, response2] = await Promise.all([
+    //   axios.get(PROPERTIES_API),
+    //   axios.get(PROPERTIES_API_2),
+    // ]);
 
-    const properties1 = response1.data || [];
+    const response2 = await axios.get(PROPERTIES_API_2);
+
+    // const properties1 = response1.data || [];
     const properties2 = response2.data || [];
 
-    console.log(`✅ First API Data Length: ${properties1.length}`);
+    // console.log(`✅ First API Data Length: ${properties1.length}`);
     console.log(`✅ Second API Data Length: ${properties2.length}`);
 
     // Dono APIs ka data combine karna
-    const combinedProperties = [...properties1, ...properties2];
+    // const combinedProperties = [...properties1, ...properties2];
 
     const db = mongoose.connection.db;
     const collection = db.collection(collectionName);
 
     // Pehle purane records delete karna, fir naye insert karna
     await collection.deleteMany({});
-    await collection.insertMany(combinedProperties);
+    await collection.insertMany(properties2);
 
     res.status(200).json({
       message: "Properties fetched & stored in DB",
-      count: combinedProperties.length,
-      data: combinedProperties,
+      count: properties2.length,
+      data: properties2,
     });
   } catch (error) {
     console.error("❌ Error Fetching Properties:", error.message || error);
