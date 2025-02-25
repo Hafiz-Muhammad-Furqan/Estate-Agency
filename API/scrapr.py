@@ -503,7 +503,7 @@ def scrape_all_pages():
     page_number = 1
     max_retries = 3
     leads_count = 0  # Variable to count the number of leads scraped
-    max_leads = 600  # Limit of leads to scrape
+    max_leads = 600  # Updated limit of leads to scrape
 
     while current_url and leads_count < max_leads:
         headers = get_headers()
@@ -530,30 +530,44 @@ def scrape_all_pages():
                         if property_id not in existing_property_ids:
                             property_details = scrape_detail_page(detail_url)
                             if property_details:
-                                # Preprocess the property data before saving it to the database
-                                processed_property = preprocess_data(property_details)
-                                save_to_db(processed_property)  # Save to DB
-                                all_properties.append(processed_property)
-                                leads_count += 1  # Increment the leads counter
+                                save_to_db(property_details)
+                                leads_count += 1
+                                print(f"✅ Lead {leads_count} scraped and saved.")
 
-                                if leads_count >= max_leads:  # Check if we have scraped the required number of leads
-                                    print("\n✅ Reached 600 leads. Scraping complete.")
-                                    return  # Stop scraping
+                                if leads_count >= max_leads:
+                                    print("🎯 600 leads scraped successfully!")
+                                    return all_properties
 
                     time.sleep(random.uniform(1, 3))  # Sleep to avoid too many requests
 
-                # Move to next page
-                next_page_tag = soup.find('a', class_='paginationNext')
-                current_url = f"{BASE_URL}{next_page_tag['href']}" if next_page_tag else None
-                page_number += 1
+                # Find next page link
+                next_page_link = soup.find('a', {'data-testid': 'gsl.uilib.Paging.nextButton'})
+                if next_page_link and 'href' in next_page_link.attrs:
+                    current_url = f"{BASE_URL}{next_page_link['href'].strip()}"
+                    page_number += 1
+                else:
+                    print("\n✅ No more pages found. Scraping complete.")
+                    break
+
+                # Exit the retry loop if successful
                 break
 
             except requests.exceptions.RequestException as e:
                 retry_attempts += 1
-                print(f"⚠️ Error occurred: {e}. Retrying... ({retry_attempts}/{max_retries})")
-                time.sleep(3)  # Wait before retrying
+                print(f"❌ Error scraping listing page {current_url}: {e}. Retrying ({retry_attempts}/{max_retries})...")
+                time.sleep(5)  # Wait before retrying
 
-    return all_properties  # Return the scraped properties
+        if retry_attempts == max_retries:
+            print(f"⚠️ Failed to scrape page {page_number} after {max_retries} attempts. Skipping to next page.")
+            next_page_link = soup.find('a', {'data-testid': 'gsl.uilib.Paging.nextButton'})
+            if next_page_link and 'href' in next_page_link.attrs:
+                current_url = f"{BASE_URL}{next_page_link['href'].strip()}"
+                page_number += 1
+            else:
+                break
+
+    print(f"\n🏁 Scraping complete. Total leads scraped: {leads_count}")
+    return all_properties
 
 # Main function to run the scraper
 def run_scraper():
