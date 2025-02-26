@@ -26,7 +26,7 @@ const DelayedLeads = () => {
         const response = await axios.get(import.meta.env.VITE_DELAYED_LEADS);
         console.log(response.data);
 
-        setDelayedLeads(response.data.data);
+        setDelayedLeads(response.data.delayed_leads);
         setLoading(false);
       } catch (error) {
         console.log(error.message);

@@ -51,6 +51,7 @@ router.get("/fetch-properties", async (req, res) => {
 router.get("/delayed-leads", async (req, res) => {
   try {
     const response = await axios.get(process.env.Delayed_Leads);
+    console.log(response.data.delayed_leads);
 
     res.status(200).json({
       data: response.data.delayed_leads,
