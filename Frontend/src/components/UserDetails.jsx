@@ -4,16 +4,13 @@ import FilterPanel from "./FilterPanel";
 import { Link } from "react-router-dom";
 import { useProperty } from "../Context/PropertyContext";
 
-const UserDetails = ({ isFilterPanelOpen, setIsFilterPanelOpen }) => {
+const UserDetails = () => {
   const { properties, setSelectedProperty, loading, filteredProperties } =
     useProperty();
 
   return (
     <div className="w-full flex items-center justify-center md:px-6 px-3 py-4 relative">
-      <FilterPanel
-        isFilterPanelOpen={isFilterPanelOpen}
-        setIsFilterPanelOpen={setIsFilterPanelOpen}
-      />
+      <FilterPanel />
 
       <div className="bg-white rounded-lg shadow w-full overflow-auto">
         {loading ? (

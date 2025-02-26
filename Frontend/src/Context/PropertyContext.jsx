@@ -6,6 +6,7 @@ const PropertyContext = createContext();
 export const PropertyProvider = ({ children }) => {
   const [properties, setProperties] = useState([]);
   const [filteredProperties, setFilteredProperties] = useState([]);
+  const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState(null);
   const [delayedLeads, setDelayedLeads] = useState([]);
   const [todayLeads, setTodayLeads] = useState([]);
@@ -40,6 +41,8 @@ export const PropertyProvider = ({ children }) => {
         setLoading,
         todayLeads,
         setTodayLeads,
+        isFilterPanelOpen,
+        setIsFilterPanelOpen,
       }}
     >
       {children}

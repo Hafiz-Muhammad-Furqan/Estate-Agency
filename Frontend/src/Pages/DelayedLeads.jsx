@@ -1,10 +1,12 @@
 import Navbar from "../components/Navbar";
 import Dashboard from "../components/Dashboard";
-import { ChevronDown, PhoneIncoming } from "lucide-react";
+import { ChevronDown, PhoneIncoming, SlidersHorizontal } from "lucide-react";
 import { useProperty } from "../Context/PropertyContext";
 import axios from "axios";
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
+import FilterPanel from "../components/FilterPanel";
+import DashboardHeader from "../components/DashboardHeader";
 
 const DelayedLeads = () => {
   const {
@@ -13,6 +15,9 @@ const DelayedLeads = () => {
     loading,
     setLoading,
     setSelectedProperty,
+    filteredProperties,
+    setIsFilterPanelOpen,
+    isFilterPanelOpen,
   } = useProperty();
   useEffect(() => {
     const fetchDelayedLeads = async () => {
@@ -41,7 +46,16 @@ const DelayedLeads = () => {
         Class={"border border-gray-300"}
         EndIcon={<ChevronDown size={20} strokeWidth={3} />}
       />
+      <DashboardHeader />
+      <div
+        className="flex items-center justify-center gap-2 lg:hidden cursor-pointer"
+        onClick={() => setIsFilterPanelOpen(!isFilterPanelOpen)}
+      >
+        <SlidersHorizontal size={20} strokeWidth={1.25} />
+        <p>Filters</p>
+      </div>
       <div className="w-full flex items-center justify-center md:px-6 px-3 py-4 relative">
+        <FilterPanel />
         <div className="bg-white rounded-lg shadow w-full overflow-auto">
           {loading ? (
             <div className="flex justify-center items-center min-h-[200px]">
@@ -67,7 +81,10 @@ const DelayedLeads = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {delayedLeads.map((property, index) => (
+                {(filteredProperties.length > 0
+                  ? filteredProperties
+                  : delayedLeads
+                ).map((property, index) => (
                   <tr key={index} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <Link

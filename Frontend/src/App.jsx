@@ -6,7 +6,6 @@ import LeadGeneration from "./Pages/LeadGeneration";
 import UpgradePlan from "./Pages/UpgradePlan";
 import DetailsPage from "./Pages/DetailsPage";
 import { PropertyProvider } from "./Context/PropertyContext";
-import FetchCsv from "./components/FetchCsv";
 import DelayedLeads from "./Pages/DelayedLeads";
 import TodayLeads from "./Pages/TodayLeads";
 
@@ -16,7 +15,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route
-            path="/lead-generation"
+            path="/leads"
             element={
               <PropertyProvider>
                 <LeadGeneration />

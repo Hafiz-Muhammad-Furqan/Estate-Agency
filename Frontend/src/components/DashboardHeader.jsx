@@ -9,10 +9,13 @@ import {
   Zap,
 } from "lucide-react";
 import React from "react";
+import { useProperty } from "../Context/PropertyContext";
 
-const DashboardHeader = ({ setIsFilterPanelOpen, isFilterPanelOpen }) => {
+const DashboardHeader = () => {
+  const { setIsFilterPanelOpen, isFilterPanelOpen } = useProperty();
+
   return (
-    <div className="w-full  items-center justify-between border-b border-gray-300 md:px-6 px-2 pb-1 hidden lg:flex">
+    <div className="w-full  items-center justify-between border-b border-gray-300 md:px-6 px-2 py-4 hidden lg:flex">
       <div className="flex items-center justify-center gap-7">
         <div className="flex items-center justify-center gap-1">
           <CalendarDays size={20} />
