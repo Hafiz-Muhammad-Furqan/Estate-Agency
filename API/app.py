@@ -1,6 +1,6 @@
 
 from fastapi import FastAPI, HTTPException,  BackgroundTasks
-from scraper import run_scrapper
+from scraper import run_scraper
 from fastapi.middleware.cors import CORSMiddleware
 from pymongo import MongoClient
 from datetime import datetime
@@ -26,7 +26,7 @@ delayed_leads_collection = db["delayed_leads"]
 @app.post("/start-scraping")
 async def start_scraping(background_tasks: BackgroundTasks):
     """Endpoint to start the scraping process in the background."""
-    background_tasks.add_task(run_scrapper)
+    background_tasks.add_task(run_scraper)
     return {"status": "started", "message": "Scraping process started in the background."}
 
 @app.get("/scraping-status")
