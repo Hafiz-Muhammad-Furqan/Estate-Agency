@@ -1,6 +1,6 @@
 
 from fastapi import FastAPI, HTTPException,  BackgroundTasks
-from scraper import run_scraper
+from scrapr import run_scraper
 from fastapi.middleware.cors import CORSMiddleware
 from pymongo import MongoClient
 from datetime import datetime
