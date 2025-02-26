@@ -29,16 +29,11 @@ delayed_leads_collection = db["delayed_leads"]
 
 # FastAPI Endpoints
 
-@app.post("/start-scraping")
+@app.get("/start-scraping")
 async def start_scraping(background_tasks: BackgroundTasks):
-    """Start the scraping process if it's not already running."""
-    global scraping_in_progress
-    if scraping_in_progress:
-        raise HTTPException(status_code=400, detail="Scraping is already in progress.")
-
-    scraping_in_progress = True
+    """Endpoint to start the scraping process in the background."""
     background_tasks.add_task(run_scraper)
-    return {"status": "started", "message": "Scraping started in the background."}
+    return {"status": "started", "message": "Scraping process started in the background."}
 
 @app.get("/scraping-status")
 async def scraping_status():
