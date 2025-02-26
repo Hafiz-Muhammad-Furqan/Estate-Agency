@@ -1,11 +1,13 @@
 
 from fastapi import FastAPI, HTTPException,  BackgroundTasks
-from scrapr import run_scraper
+from scrapr import scrape_all_pages
 from fastapi.middleware.cors import CORSMiddleware
 from pymongo import MongoClient
 from datetime import datetime
 app = FastAPI()
-
+from typing import List,Dict
+from datetime import datetime, timedelta
+from pydantic import BaseModel
 # Enable CORS
 app.add_middleware(
     CORSMiddleware,
@@ -26,7 +28,7 @@ delayed_leads_collection = db["delayed_leads"]
 @app.post("/start-scraping")
 async def start_scraping(background_tasks: BackgroundTasks):
     """Endpoint to start the scraping process in the background."""
-    background_tasks.add_task(run_scraper)
+    background_tasks.add_task(scrape_all_pages)
     return {"status": "started", "message": "Scraping process started in the background."}
 
 @app.get("/scraping-status")
@@ -49,13 +51,12 @@ async def get_delayed_leads():
     delayed_leads = list(delayed_leads_collection.find({}, {"_id": 0}))
     return {"status": "success", "delayed_leads": delayed_leads}
 
+@app.get("/today-leads", response_model=List[Dict])
+def get_today_leads():
+    today = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+    leads = list(properties_collection.find({"expiration_date": {"$gte": today}}, {"_id": 0}))
+    return leads
 
-@app.get("/leads/today")
-async def get_today_leads():
-    """Retrieve leads added today."""
-    today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
-    leads = list(properties_collection.find({"created_at": {"$gte": today}}, {"_id": 0}))
-    return {"status": "success", "today_leads": leads}
 
 if __name__ == "__main__":
     import uvicorn
