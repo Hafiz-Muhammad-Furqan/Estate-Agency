@@ -7,6 +7,8 @@ import UpgradePlan from "./Pages/UpgradePlan";
 import DetailsPage from "./Pages/DetailsPage";
 import { PropertyProvider } from "./Context/PropertyContext";
 import FetchCsv from "./components/FetchCsv";
+import DelayedLeads from "./Pages/DelayedLeads";
+import TodayLeads from "./Pages/TodayLeads";
 
 const App = () => {
   return (
@@ -30,9 +32,24 @@ const App = () => {
               </PropertyProvider>
             }
           />
+          <Route
+            path="/delayed-leads"
+            element={
+              <PropertyProvider>
+                <DelayedLeads />
+              </PropertyProvider>
+            }
+          />
+          <Route
+            path="/today-leads"
+            element={
+              <PropertyProvider>
+                <TodayLeads />
+              </PropertyProvider>
+            }
+          />
         </Route>
-        <Route path="/upgrade-plan" element={<UpgradePlan />} />
-        <Route path="/csv" element={<FetchCsv />} />
+        <Route path="/upgrade" element={<UpgradePlan />} />
       </Routes>
     </Router>
   );

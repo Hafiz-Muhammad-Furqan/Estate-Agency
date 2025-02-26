@@ -10,23 +10,24 @@ import {
   Code,
   Check,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useProperty } from "../Context/PropertyContext";
 
 const DetailsPage = () => {
   const { selectedProperty } = useProperty();
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
       <header className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 py-3 sm:py-2">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
             <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-4">
-              <Link
-                to="/lead-generation"
-                className="text-lg font-semibold text-gray-500"
+              <button
+                onClick={() => navigate(-1)}
+                className="text-lg font-semibold text-gray-500 cursor-pointer"
               >
                 ← Back
-              </Link>
+              </button>
               <h1 className="text-lg font-medium">Joyce Jing</h1>
             </div>
             <div className="flex items-center gap-4">
