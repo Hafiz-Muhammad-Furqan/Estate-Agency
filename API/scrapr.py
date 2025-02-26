@@ -168,11 +168,3 @@ def scrape_all_pages():
             continue
 
     return {"status": "success", "message": f"Total leads scraped: {leads_count}"}
-
-
-def run_scraper():
- 
-    scrape_all_pages()  # Scrape and save all properties
-   
-if __name__ == "__main__":
-    run_scraper()
