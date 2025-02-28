@@ -27,7 +27,7 @@ const DelayedLeads = () => {
           "https://criminal-crayfish-test123as-72d9b4b8.koyeb.app/delayed-leads"
         );
 
-        setDelayedLeads(response.data.data);
+        setDelayedLeads(response.data.delayed_leads);
         setLoading(false);
       } catch (error) {
         console.log(error.message);
