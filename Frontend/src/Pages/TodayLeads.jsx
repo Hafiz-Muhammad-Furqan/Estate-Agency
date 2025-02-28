@@ -23,10 +23,12 @@ const TodayLeads = () => {
     const fetchTodayLeads = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(import.meta.env.VITE_TODAY_LEADS);
-        console.log(response.data.data);
+        const response = await axios.get(
+          "https://estate-agency-hazel.vercel.app/api/v1/today-leads"
+        );
+        console.log(response.data.data.leads);
 
-        setTodayLeads(response.data.data);
+        setTodayLeads(response.data.data.leads);
         setLoading(false);
       } catch (error) {
         console.log(error.message);

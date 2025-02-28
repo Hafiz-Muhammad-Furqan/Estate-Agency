@@ -15,7 +15,9 @@ export const PropertyProvider = ({ children }) => {
   useEffect(() => {
     const getData = async () => {
       try {
-        const response = await axios.get(import.meta.env.VITE_API_URL);
+        const response = await axios.get(
+          "https://estate-agency-hazel.vercel.app/api/v1/fetch-properties"
+        );
         setProperties(response.data.data);
         setLoading(false);
       } catch (error) {

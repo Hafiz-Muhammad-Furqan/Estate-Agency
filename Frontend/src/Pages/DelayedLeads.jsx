@@ -23,10 +23,11 @@ const DelayedLeads = () => {
     const fetchDelayedLeads = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(import.meta.env.VITE_DELAYED_LEADS);
-        console.log(response.data);
+        const response = await axios.get(
+          "https://estate-agency-hazel.vercel.app/api/v1/delayed-leads"
+        );
 
-        setDelayedLeads(response.data.delayed_leads);
+        setDelayedLeads(response.data.data);
         setLoading(false);
       } catch (error) {
         console.log(error.message);

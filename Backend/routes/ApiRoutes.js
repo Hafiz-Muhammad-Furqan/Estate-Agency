@@ -4,7 +4,8 @@ const mongoose = require("mongoose");
 
 const router = express.Router();
 // const PROPERTIES_API = process.env.PROPERTIES_API;
-const PROPERTIES_API_2 = process.env.PROPERTIES_API_2;
+const PROPERTIES_API_2 =
+  "https://criminal-crayfish-test123as-72d9b4b8.koyeb.app/leads";
 
 const collectionName = "Properties";
 
@@ -50,7 +51,9 @@ router.get("/fetch-properties", async (req, res) => {
 
 router.get("/delayed-leads", async (req, res) => {
   try {
-    const response = await axios.get(process.env.Delayed_Leads);
+    const response = await axios.get(
+      "https://criminal-crayfish-test123as-72d9b4b8.koyeb.app/delayed-leads"
+    );
     console.log(response.data.delayed_leads);
 
     res.status(200).json({
@@ -68,7 +71,9 @@ router.get("/delayed-leads", async (req, res) => {
 });
 router.get("/today-leads", async (req, res) => {
   try {
-    const response = await axios.get(process.env.TODAY_LEADS);
+    const response = await axios.get(
+      "https://fast-api-git-main-hafiz-muhammad-furqans-projects-e5d44d02.vercel.app/today-leads"
+    );
 
     res.status(200).json({
       data: response.data,
