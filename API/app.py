@@ -48,7 +48,7 @@ async def scraping_status():
     leads_count = properties_collection.count_documents({})
     return {"status": "success", "leads_count": leads_count}
 
-@app.post("/leads")
+@app.get("/leads")
 async def get_leads():
     """Retrieve all scraped leads."""
     leads = list(properties_collection.find({}, {"_id": 0}))
