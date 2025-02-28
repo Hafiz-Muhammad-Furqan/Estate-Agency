@@ -1,16 +1,16 @@
-from fastapi import FastAPI, BackgroundTasks
-from fastapi.responses import JSONResponse 
+from fastapi import FastAPI, BackgroundTasks, HTTPException
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pymongo import MongoClient
 from datetime import datetime, timedelta, timezone
-from typing import List, Dict , Literal
+from typing import Literal
 from pydantic import BaseModel
 from scraper import scrape_all_pages
 from contextlib import asynccontextmanager
-import json
+import os
 from bson import ObjectId
 
-# MongoDB Connection URI
+# 🔒 Secure MongoDB Connection URI (Use Environment Variables)
 MONGO_URI = "mongodb+srv://abdullbasit7446:3JiTkQl8ErTFOiP2@seloger1.5hxkg.mongodb.net/?retryWrites=true&w=majority&appName=seloger1"
 
 # Use FastAPI lifespan to manage MongoDB connection
@@ -18,14 +18,17 @@ MONGO_URI = "mongodb+srv://abdullbasit7446:3JiTkQl8ErTFOiP2@seloger1.5hxkg.mongo
 async def lifespan(app: FastAPI):
     global client, db, properties_collection, leads_collection, delayed_leads_collection
     print("🔌 Connecting to MongoDB...")
-    client = MongoClient(MONGO_URI)
-    db = client["seloger_db"]
-    properties_collection = db["properties"]
-    leads_collection = db["leads"]
-    delayed_leads_collection = db["delayed_leads"]
-    yield  # App runs while this context is active
-    print("❌ Closing MongoDB connection...")
-    client.close()
+    
+    try:
+        client = MongoClient(MONGO_URI)
+        db = client["seloger_db"]
+        properties_collection = db["properties"]
+        leads_collection = db["leads"]
+        delayed_leads_collection = db["delayed_leads"]
+        yield  # App runs while this context is active
+    finally:
+        print("❌ Closing MongoDB connection...")
+        client.close()
 
 app = FastAPI(lifespan=lifespan)
 
@@ -38,43 +41,53 @@ app.add_middleware(
 )
 
 # 🏗️ FastAPI Endpoints
+
+@app.get("/")
+async def health_check():
+    """Health check endpoint."""
+    return {"status": "Hello from Seloger Scraper API"}
+
 @app.get("/start-scraper")
 async def start_scraper(background_tasks: BackgroundTasks):
     """Starts the scraper in the background."""
     background_tasks.add_task(scrape_all_pages)
     return {"message": "Scraper started in the background"}
-# Health check endpoint
-@app.get("/")
-async def health_check():
-    return {"status": "Hello from Seloger Scrapper API"}
 
 @app.get("/scraping-status")
 async def scraping_status():
     """Check the number of scraped leads."""
-    leads_count = properties_collection.count_documents({})
-    return {"status": "success", "leads_count": leads_count}
+    try:
+        leads_count = properties_collection.count_documents({})
+        return {"status": "success", "leads_count": leads_count}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/leads")
 async def get_leads():
     """Retrieve all scraped leads."""
-    leads = list(properties_collection.find({}, {"_id": 0}))
-    return {"status": "success", "leads": leads}
+    try:
+        leads = list(properties_collection.find({}, {"_id": 0}))
+        return {"status": "success", "leads": leads}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/delayed-leads")
 async def get_delayed_leads():
     """Retrieve all delayed leads."""
-    delayed_leads = list(delayed_leads_collection.find({}, {"_id": 0}))
-    return {"status": "success", "delayed_leads": delayed_leads}
+    try:
+        delayed_leads = list(delayed_leads_collection.find({}, {"_id": 0}))
+        return {"status": "success", "delayed_leads": delayed_leads}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/today-leads")
-def get_today_new_leads():
+async def get_today_new_leads():
     """Fetch leads added today based on expiration_date - 7 days."""
     try:
         now = datetime.now(timezone.utc)
         start_of_day = datetime(now.year, now.month, now.day, tzinfo=timezone.utc)
         end_of_day = start_of_day.replace(hour=23, minute=59, second=59)
 
-        # Leads where expiration_date is exactly 7 days from today
         today_new_leads = list(leads_collection.find({
             "expiration_date": {
                 "$gte": start_of_day + timedelta(days=7),
@@ -89,9 +102,10 @@ def get_today_new_leads():
         return {"count": len(today_new_leads), "leads": today_new_leads}
 
     except Exception as e:
-        return {"error": str(e)}
+        raise HTTPException(status_code=500, detail=str(e))
 
-def move_expired_delayed_leads():
+@app.post("/move-delayed-leads")
+async def move_delayed_leads():
     """Moves expired delayed leads to the main leads collection."""
     try:
         now = datetime.now(timezone.utc)
@@ -101,25 +115,23 @@ def move_expired_delayed_leads():
         if not expired_leads:
             return {"status": "no expired leads", "moved_leads": []}
 
-        moved_leads = []  # Store details of moved leads
+        moved_leads = []
 
         for lead in expired_leads:
             phone_number = lead.get("phone_number")
 
-            # Check if already exists in main collection
+            # Check for duplicates
             if leads_collection.find_one({"phone_number": phone_number}):
-                continue  # Skip duplicates
+                continue
 
             # Set a new expiration date (7 days from now)
             lead["expiration_date"] = now + timedelta(days=7)
 
             # Insert into leads collection
             leads_collection.insert_one({"phone_number": phone_number, "expiration_date": lead["expiration_date"]})
+            properties_collection.insert_one(lead)  # Store full lead details
 
-            # Insert into properties collection (full details)
-            properties_collection.insert_one(lead)
-
-            moved_leads.append(lead)  # Append full lead details
+            moved_leads.append(lead)
 
             # Remove from delayed collection
             delayed_leads_collection.delete_one({"_id": lead["_id"]})
@@ -127,100 +139,30 @@ def move_expired_delayed_leads():
         return {"status": "success", "moved_leads": moved_leads}
 
     except Exception as e:
-        return {"status": "error", "message": str(e)}
+        raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/move_delayed_leads/")
-async def move_delayed_leads():
-    """API endpoint to move expired delayed leads."""
-    result = move_expired_delayed_leads()
-    return result
+@app.post("/remove-expired-leads")
+async def remove_expired_leads():
+    """Removes expired leads from the database."""
+    try:
+        now = datetime.now(timezone.utc)
+        expired_leads = list(leads_collection.find({"expiration_date": {"$lt": now}}))
 
-def remove_expired_leads():
-    """Removes leads from both collections when their 7-day expiration has passed."""
-    now = datetime.now(timezone.utc)
+        if not expired_leads:
+            return {"status": "no expired leads", "deleted_leads": []}
 
-    # Find expired leads in leads_collection
-    expired_leads = list(leads_collection.find({"expiration_date": {"$lt": now}}))
+        deleted_leads = []
 
-    if not expired_leads:
-        return {"status": "no expired leads", "deleted_leads": []}
+        for lead in expired_leads:
+            phone_number = lead.get("phone_number")
+            leads_collection.delete_one({"_id": lead["_id"]})
+            properties_collection.delete_one({"phone_number": phone_number})
+            deleted_leads.append(phone_number)
 
-    deleted_leads = []
+        return {"status": "success", "deleted_leads": deleted_leads}
 
-    for lead in expired_leads:
-        phone_number = lead.get("phone_number")
-        
-        # Delete from leads_collection
-        leads_collection.delete_one({"_id": lead["_id"]})
-        
-        # Delete from properties_collection
-        properties_collection.delete_one({"phone_number": phone_number})
-
-        deleted_leads.append(phone_number)
-
-    return {"status": "success", "deleted_leads": deleted_leads}
-
-@app.post("/remove_expired_leads/")
-async def remove_expired_leads_endpoint():
-    """API endpoint to remove expired leads from the database."""
-    result = remove_expired_leads()
-    return result
-
-
-
-# @app.post("/leads/move/{lead_id}")
-# async def move_delayed_lead(lead_id: str):
-#     try:
-#         # Convert the lead_id string to ObjectId
-#         lead_object_id = ObjectId(lead_id)
-        
-#         # Find the delayed lead by ID
-#         delayed_lead = delayed_leads_collection.find_one({"_id": lead_object_id})
-        
-#         if not delayed_lead:
-#             raise HTTPException(status_code=404, detail="Delayed lead not found")
-        
-#         # Remove the expiration date to move it to today's list
-#         delayed_lead.pop("expiration_date", None)
-        
-#         # Insert the lead into the main leads collection
-#         leads_collection.insert_one(delayed_lead)
-        
-#         # Remove the lead from the delayed_leads collection
-#         delayed_leads_collection.delete_one({"_id": lead_object_id})
-        
-#         return {"status": "success", "message": f"Lead {lead_id} moved to today's list"}
-    
-#     except Exception as e:
-#         raise HTTPException(status_code=500, detail=str(e))
-
-
-# # Pydantic model for request body
-# class UpdateLeadStatusRequest(BaseModel):
-#     status: Literal["hot", "cold"]  # Only allow "hot" or "cold" as valid values
-
-# @app.patch("/leads/status/{lead_id}")
-# async def update_lead_status(lead_id: str, request: UpdateLeadStatusRequest):
-#     try:
-#         # Convert the lead_id string to ObjectId
-#         lead_object_id = ObjectId(lead_id)
-        
-#         # Check if the lead exists
-#         lead = leads_collection.find_one({"_id": lead_object_id})
-#         if not lead:
-#             raise HTTPException(status_code=404, detail="Lead not found")
-        
-#         # Update the lead's status (add or update the field)
-#         leads_collection.update_one(
-#             {"_id": lead_object_id},
-#             {"$set": {"status": request.status}}  # Adds or updates the "status" field
-#         )
-        
-#         return {"status": "success", "message": f"Lead {lead_id} updated to {request.status}"}
-    
-#     except Exception as e:
-#         raise HTTPException(status_code=500, detail=str(e))
-# Run FastAPI app
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 if __name__ == "__main__":
