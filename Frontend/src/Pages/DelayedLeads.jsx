@@ -24,7 +24,7 @@ const DelayedLeads = () => {
       setLoading(true);
       try {
         const response = await axios.get(
-          "https://estate-agency-hazel.vercel.app/api/v1/delayed-leads"
+          "https://criminal-crayfish-test123as-72d9b4b8.koyeb.app/delayed-leads"
         );
 
         setDelayedLeads(response.data.data);

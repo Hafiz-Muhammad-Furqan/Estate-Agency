@@ -72,7 +72,7 @@ router.get("/delayed-leads", async (req, res) => {
 router.get("/today-leads", async (req, res) => {
   try {
     const response = await axios.get(
-      "https://fast-api-git-main-hafiz-muhammad-furqans-projects-e5d44d02.vercel.app/today-leads"
+      "https://criminal-crayfish-test123as-72d9b4b8.koyeb.app/today-leads"
     );
 
     res.status(200).json({
