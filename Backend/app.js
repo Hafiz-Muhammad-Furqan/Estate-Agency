@@ -12,7 +12,7 @@ app.use(cors());
 app.use(express.json());
 
 connectDB();
-// require("./services/cronJob");
+require("./services/cronJob");
 
 app.get("/", (req, res) => {
   res.send("Backend API Running Successfully! 🚀");
