@@ -8,6 +8,8 @@ import DetailsPage from "./Pages/DetailsPage";
 import { PropertyProvider } from "./Context/PropertyContext";
 import DelayedLeads from "./Pages/DelayedLeads";
 import TodayLeads from "./Pages/TodayLeads";
+import Signup from "./Pages/Signup";
+import Signin from "./Pages/Signin";
 
 const App = () => {
   return (
@@ -49,6 +51,8 @@ const App = () => {
           />
         </Route>
         <Route path="/upgrade" element={<UpgradePlan />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/signin" element={<Signin />} />
       </Routes>
     </Router>
   );

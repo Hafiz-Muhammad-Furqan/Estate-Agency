@@ -1,7 +1,6 @@
 const axios = require("axios");
 
-const SCRAPER_API_2 =
-  "https://criminal-crayfish-test123as-72d9b4b8.koyeb.app/start-scraper";
+const SCRAPER_API_2 = process.env.SCRAPER_API_2;
 
 const runScraper = async () => {
   try {
