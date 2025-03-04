@@ -10,6 +10,7 @@ import DelayedLeads from "./Pages/DelayedLeads";
 import TodayLeads from "./Pages/TodayLeads";
 import Signup from "./Pages/Signup";
 import Signin from "./Pages/Signin";
+import WatchDemo from "./Pages/WatchDemo";
 
 const App = () => {
   return (
@@ -46,6 +47,14 @@ const App = () => {
             element={
               <PropertyProvider>
                 <TodayLeads />
+              </PropertyProvider>
+            }
+          />
+          <Route
+            path="/demo"
+            element={
+              <PropertyProvider>
+                <WatchDemo />
               </PropertyProvider>
             }
           />

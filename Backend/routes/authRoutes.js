@@ -32,13 +32,16 @@ router.post("/signup", async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Save user to database
-    const newUser = new User({ username, email, password: hashedPassword });
+    const newUser = new User({
+      username,
+      email,
+      password: hashedPassword,
+      provider: "email",
+    });
     await newUser.save();
 
     // Generate JWT Token
-    const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
-    });
+    const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
 
     res.status(201).json({ message: "Signup successful", token });
   } catch (error) {
@@ -57,19 +60,37 @@ router.post("/signin", async (req, res) => {
     }
 
     // Validate password
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ message: "Invalid email or password" });
     }
 
     // Generate JWT token
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
-    });
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
 
     res.status(200).json({ message: "Signin successful", token, user });
   } catch (error) {
     res.status(500).json({ message: "Server Error" });
+  }
+});
+
+router.post("/social-login", async (req, res) => {
+  try {
+    const { firstName, email, provider } = req.body;
+
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      user = new User({ username: firstName, email, provider });
+      await user.save();
+    }
+
+    // Generate JWT Token
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
+
+    res.json({ token, message: "Sign-in successful" });
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
   }
 });
 
