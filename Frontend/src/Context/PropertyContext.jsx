@@ -18,6 +18,7 @@ export const PropertyProvider = ({ children }) => {
         const response = await axios.get(
           "https://estate-agency-hazel.vercel.app/api/v1/fetch-properties"
         );
+
         setProperties(response.data.data);
         setLoading(false);
       } catch (error) {

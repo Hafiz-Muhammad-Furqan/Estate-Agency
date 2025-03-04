@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Layout from "./Layout/Layout";
 import List from "./Pages/List";
@@ -13,6 +13,13 @@ import Signin from "./Pages/Signin";
 import WatchDemo from "./Pages/WatchDemo";
 
 const App = () => {
+  useEffect(() => {
+    const getUserData = async () => {
+      const response = await axios.get(
+        "http://localhost:5000/api/v1/getUserData"
+      );
+    };
+  });
   return (
     <Router>
       <Routes>

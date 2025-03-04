@@ -38,7 +38,7 @@ const MainLayout = () => {
       {/* Content Wrapper */}
       <div
         className={`flex-1 transition-all duration-300 ${
-          isSidebarOpen ? "ml-80" : "ml-0"
+          true ? "ml-80" : "ml-0"
         }`}
       >
         <Header setIsSidebarOpen={setIsSidebarOpen} />
