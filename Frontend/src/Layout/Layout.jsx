@@ -25,24 +25,26 @@ import Sidebar from "../components/Sidebar";
 import { Outlet } from "react-router-dom";
 
 const MainLayout = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarExpanded, setIsSidebarExpanded] = useState(false);
 
   return (
-    <div className="relative flex">
+    <div className="relative flex transition-all duration-500 ease-in-out">
       {/* Sidebar */}
       <Sidebar
-        isSidebarOpen={isSidebarOpen}
-        setIsSidebarOpen={setIsSidebarOpen}
+        isExpanded={isSidebarExpanded}
+        setIsExpanded={setIsSidebarExpanded}
       />
 
       {/* Content Wrapper */}
       <div
-        className={`flex-1 transition-all duration-300 ${
-          true ? "ml-80" : "ml-0"
+        className={`flex-1 transition-all duration-500 ease-in-out ${
+          isSidebarExpanded ? "ml-80" : "ml-20"
         }`}
       >
-        <Header setIsSidebarOpen={setIsSidebarOpen} />
-        <Outlet />
+        <Header setIsSidebarOpen={setIsSidebarExpanded} />
+        <div className="p-6">
+          <Outlet />
+        </div>
       </div>
     </div>
   );

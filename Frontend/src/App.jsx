@@ -11,15 +11,9 @@ import TodayLeads from "./Pages/TodayLeads";
 import Signup from "./Pages/Signup";
 import Signin from "./Pages/Signin";
 import WatchDemo from "./Pages/WatchDemo";
+import PersonDetails from "./Pages/PersonDetails";
 
 const App = () => {
-  useEffect(() => {
-    const getUserData = async () => {
-      const response = await axios.get(
-        "http://localhost:5000/api/v1/getUserData"
-      );
-    };
-  });
   return (
     <Router>
       <Routes>
@@ -32,7 +26,14 @@ const App = () => {
               </PropertyProvider>
             }
           />
-          <Route path="/list" element={<List />} />
+          <Route
+            path="/list"
+            element={
+              <PropertyProvider>
+                <List />
+              </PropertyProvider>
+            }
+          />
           <Route
             path="/user-details"
             element={
@@ -62,6 +63,14 @@ const App = () => {
             element={
               <PropertyProvider>
                 <WatchDemo />
+              </PropertyProvider>
+            }
+          />
+          <Route
+            path="/user"
+            element={
+              <PropertyProvider>
+                <PersonDetails />
               </PropertyProvider>
             }
           />

@@ -12,13 +12,13 @@ const UserDetails = () => {
     <div className="w-full flex items-center justify-center md:px-6 px-3 py-4 relative">
       <FilterPanel />
 
-      <div className="bg-white rounded-lg shadow w-full overflow-auto">
+      <div className="bg-white rounded-lg shadow w-full overflow-auto border border-black">
         {loading ? (
           <div className="flex justify-center items-center min-h-[200px]">
             <div className="w-12 h-12 border-4 border-blue-500 border-solid border-t-transparent rounded-full animate-spin"></div>
           </div>
         ) : (
-          <table className="w-full divide-y divide-gray-200">
+          <table className="w-full divide-y divide-gray-800">
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
